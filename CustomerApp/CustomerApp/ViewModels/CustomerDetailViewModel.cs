@@ -1,6 +1,6 @@
-﻿using System;
-
-using CustomerApp.Models;
+﻿using CustomerApp.Models;
+using CustomerApp.Views;
+using Xamarin.Forms;
 
 namespace CustomerApp.ViewModels
 {
@@ -11,6 +11,11 @@ namespace CustomerApp.ViewModels
         {
             Title = item?.Name;
             Item = item;
+
+            MessagingCenter.Subscribe<NewItemPage, Customer>(this, "AddItem", (obj, customer) =>
+            {
+                Item = customer; OnPropertyChanged(nameof(Item));
+            });
         }
     }
 }

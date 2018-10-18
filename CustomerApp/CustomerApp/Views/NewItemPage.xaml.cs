@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-
+using System.Collections.ObjectModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 using CustomerApp.Models;
+using CustomerApp.Services.Interfaces;
 
 namespace CustomerApp.Views
 {
@@ -12,24 +12,47 @@ namespace CustomerApp.Views
     public partial class NewItemPage : ContentPage
     {
         public Customer Item { get; set; }
+        public ObservableCollection<string> Errors { get; set; }
+        private IValidator<Customer> _customerValidator;
 
         public NewItemPage()
         {
-            InitializeComponent();
-
-            Item = new Customer
-            {
-                Text = "Item name",
-                Description = "This is an item description."
-            };
-
+           
+            Item = new Customer(); 
             BindingContext = this;
         }
 
-        async void Save_Clicked(object sender, EventArgs e)
+        private void Init()
         {
-            MessagingCenter.Send(this, "AddItem", Item);
-            await Navigation.PopModalAsync();
+            InitializeComponent();
+            _customerValidator = DependencyService.Get<IValidator<Customer>>();
+            
+        }
+
+        public NewItemPage(Customer customer)
+        {
+            Init();
+
+            Item = new Customer()
+            {
+                Id = customer.Id,
+                Name = customer.Name,
+                Surname = customer.Surname,
+                PhoneNumber = customer.PhoneNumber,
+                Address = customer.Address
+            };
+            BindingContext = this;
+        }
+
+        private async void Save_Clicked(object sender, EventArgs e)
+        {
+            Errors = new ObservableCollection<string>(_customerValidator.Validate(Item));
+            OnPropertyChanged(nameof(Errors));
+            if (Errors.Count == 0)
+            {
+                MessagingCenter.Send(this, "AddItem", Item);
+                await Navigation.PopModalAsync();
+            }
         }
     }
 }

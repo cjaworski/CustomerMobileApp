@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CustomerApp.Models;
 
-namespace CustomerApp.Services
+namespace CustomerApp.Services.Interfaces
 {
     public interface IRestService<T>
     {
         Task<List<T>> GetAllCustomersAsync ();
 
-        Task SaveCustomerAsync (T item, bool isNewItem);
+        Task SaveCustomerAsync (T item);
 
         Task DeleteCustomersAsync (long id);
     }

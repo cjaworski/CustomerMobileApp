@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CustomerApp.Models
+﻿namespace CustomerApp.Models
 {
     public class Customer
     {

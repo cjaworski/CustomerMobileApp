@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
@@ -23,9 +24,18 @@ namespace CustomerApp.ViewModels
 
             MessagingCenter.Subscribe<NewItemPage, Customer>(this, "AddItem", async (obj, item) =>
             {
-                var _item = item as Customer;
-                Items.Add(_item);
-                await DataStore.AddItemAsync(_item);
+                if (Items.All(x => x.Id != item.Id))
+                {
+                    Items.Add(item);
+                }
+         
+                await DataStore.SaveItemAsync(item, true);
+            });
+
+            MessagingCenter.Subscribe<ItemDetailPage, Customer>(this, "DeleteItem", async (obj, item) =>
+            {
+                Items.Remove(item);
+                await DataStore.DeleteItemAsync(item.Id);
             });
         }
 
@@ -39,7 +49,7 @@ namespace CustomerApp.ViewModels
             try
             {
                 Items.Clear();
-                var items = await DataStore.GetItemsAsync(true);
+                var items = await DataStore.GetItemsAsync();
                 foreach (var item in items)
                 {
                     Items.Add(item);

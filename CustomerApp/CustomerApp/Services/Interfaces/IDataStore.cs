@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CustomerApp.Models;
 
-namespace CustomerApp.Services
+namespace CustomerApp.Services.Interfaces
 {
     public interface IDataStore<T>
     {
-        Task<List<T>> GetTasksAsync();
+        Task<List<T>> GetItemsAsync();
         Task SaveItemAsync(T item, bool isNewItem = false);
         Task DeleteItemAsync(long id);
     }

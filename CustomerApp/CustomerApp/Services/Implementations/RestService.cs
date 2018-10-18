@@ -5,9 +5,12 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using CustomerApp.Models;
+using CustomerApp.Services.Implementations;
+using CustomerApp.Services.Interfaces;
 using Newtonsoft.Json;
 
-namespace CustomerApp.Services
+[assembly: Xamarin.Forms.Dependency(typeof(RestService))]
+namespace CustomerApp.Services.Implementations
 {
 	public class RestService : IRestService<Customer>
 	{
@@ -24,7 +27,6 @@ namespace CustomerApp.Services
 	    {
 	        Items = new List<Customer> ();
 
-	        // RestUrl = http://developer.xamarin.com:8081/api/todoitems
 	        var uri = new Uri (string.Format (Constants.RestUrl, string.Empty));
 
 	        try {
@@ -40,19 +42,18 @@ namespace CustomerApp.Services
 	        return Items;
 	    }
 
-	    public async Task SaveCustomerAsync (Customer item, bool isNewItem = false)
+	    public async Task SaveCustomerAsync (Customer item)
 		{
-			// RestUrl = http://developer.xamarin.com:8081/api/todoitems
-			var uri = new Uri (string.Format (Constants.RestUrl, string.Empty));
-
 			try {
 				var json = JsonConvert.SerializeObject (item);
 				var content = new StringContent (json, Encoding.UTF8, "application/json");
 
-				HttpResponseMessage response = null;
-				if (isNewItem) {
+				HttpResponseMessage response;
+				if (item.Id == 0) {
+				    var uri = new Uri (Constants.RestUrl);
 					response = await _client.PostAsync (uri, content);
 				} else {
+				    var uri = new Uri ($"{Constants.RestUrl}/{item.Id}");
 					response = await _client.PutAsync (uri, content);
 				}
 				
@@ -67,8 +68,7 @@ namespace CustomerApp.Services
 
 	    public async Task DeleteCustomersAsync (long id)
 		{
-			// RestUrl = http://developer.xamarin.com:8081/api/todoitems/{0}
-			var uri = new Uri (string.Format (Constants.RestUrl, id));
+			var uri = new Uri ($"{Constants.RestUrl}/{id}");
 
 			try {
 				var response = await _client.DeleteAsync (uri);
